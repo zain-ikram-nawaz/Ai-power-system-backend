@@ -17,14 +17,25 @@ const app = express();
 
 connectDB();
 
+// Dynamic CORS origin handling
+const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : [];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, or Postman)
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
+
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
@@ -41,7 +52,9 @@ app.use("/api/history", historyRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 8080;
+
+// Listen on 0.0.0.0 for containerized deployment
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`);
 });
