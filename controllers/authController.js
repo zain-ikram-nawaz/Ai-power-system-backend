@@ -16,7 +16,7 @@ const register = asyncHandler(async (req, res) => {
   const token = generateToken(user._id);
   setTokenCookie(res, token);
 
-  sendResponse(res, 201, { user }, "Registration successful");
+  sendResponse(res, 201, { user, token }, "Registration successful");
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -30,7 +30,7 @@ const login = asyncHandler(async (req, res) => {
   const token = generateToken(user._id);
   setTokenCookie(res, token);
 
-  sendResponse(res, 200, { user }, "Login successful");
+  sendResponse(res, 200, { user, token }, "Login successful");
 });
 
 const logout = asyncHandler(async (req, res) => {

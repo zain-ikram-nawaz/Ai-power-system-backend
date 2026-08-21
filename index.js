@@ -17,10 +17,12 @@ const app = express();
 
 connectDB();
 
-// Clean up allowed origins (removes extra spaces and trailing slashes)
-const allowedOrigins = process.env.CLIENT_URL || "http://localhost:3000"
-  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
-  : [];
+  // Clean up allowed origins (removes extra spaces and trailing slashes)
+  const rawOrigins = process.env.CLIENT_URL || "http://localhost:3000";
+  const allowedOrigins = rawOrigins
+    .split(",")
+    .map((url) => url.trim().replace(/\/$/, ""))
+    .filter(Boolean);
 
 app.use(
   cors({
