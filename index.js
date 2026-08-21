@@ -18,7 +18,7 @@ const app = express();
 connectDB();
 
 // Clean up allowed origins (removes extra spaces and trailing slashes)
-const allowedOrigins = process.env.CLIENT_URL
+const allowedOrigins = process.env.CLIENT_URL || "http://localhost:3000"
   ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
   : [];
 
