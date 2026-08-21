@@ -7,21 +7,25 @@ const generateToken = (userId) => {
 };
 
 const setTokenCookie = (res, token) => {
+  const maxAge = parseInt(process.env.COOKIE_MAX_AGE_MS, 10) || 7 * 24 * 60 * 60 * 1000;
+  const isProduction = process.env.NODE_ENV === "production";
+
   res.cookie("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: Number(process.env.COOKIE_MAX_AGE_MS) || 7 * 24 * 60 * 60 * 1000,
-    path: "/",
+    maxAge: maxAge,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
 };
 
 const clearTokenCookie = (res) => {
-  res.clearCookie("token", {
+  const isProduction = process.env.NODE_ENV === "production";
+
+  res.cookie("token", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
+    expires: new Date(0),
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
   });
 };
 
