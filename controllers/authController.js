@@ -27,11 +27,11 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid email or password");
   }
 
-// authController.js - login / register handlers mein
-const token = generateToken(user._id);
-setTokenCookie(res, token); // Optional cookie backup
+  const token = generateToken(user._id);
+  setTokenCookie(res, token);
 
-sendResponse(res, 200, { user, token }, "Login successful");
+  sendResponse(res, 200, { user }, "Login successful");
+});
 
 const logout = asyncHandler(async (req, res) => {
   clearTokenCookie(res);
