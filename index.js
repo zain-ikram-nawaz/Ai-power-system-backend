@@ -17,14 +17,19 @@ const app = express();
 
 connectDB();
 
-// Dynamic CORS origin handling
-const allowedOrigins = process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",") : [];
+// Clean up allowed origins (removes extra spaces and trailing slashes)
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(",").map((url) => url.trim().replace(/\/$/, ""))
+  : [];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) return callback(null, true);
+
+      const cleanOrigin = origin.replace(/\/$/, "");
+      if (allowedOrigins.includes(cleanOrigin)) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));
@@ -40,6 +45,12 @@ if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
 
+// Root endpoint for platform health checks and browser visits
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "Smart Study Assistant API is active and running" });
+});
+
+// Dedicated health endpoint
 app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "Smart Study Assistant API is running" });
 });
@@ -54,7 +65,7 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 8080;
 
-// Listen on 0.0.0.0 for containerized deployment
+// Listen on 0.0.0.0 for containerized environments
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV || "development"} mode`);
 });
